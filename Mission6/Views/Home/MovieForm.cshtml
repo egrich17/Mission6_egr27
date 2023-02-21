@@ -9,17 +9,17 @@
 
 <!--Create form for users to add their suggested movies-->
 <div>
+    <!--implement validation-->
+    <!--use ViewBag to grab all the category names / ids-->
     <form method="post">
-        <label asp-for="Category">Category:</label>
-        <select asp-for="Category">
-            <option value="Action">Action / Adventure</option>
-            <option value="Comedy">Comedy</option>
-            <option value="Drama">Drama</option>
-            <option value="Family">Family</option>
-            <option value="Horor">Horror / Suspense</option>
-            <option value="Misc">Miscellaneous</option>
-            <option value="TV">Television</option>
-            <option value="VHS">VHS</option>
+        <div asp-validation-summary="All"></div>
+        <label asp-for="CategoryId">Category:</label>
+        <select asp-for="CategoryId">
+            <option value="">Select a Category</option>
+            @foreach (Category c in ViewBag.Categories)
+            {
+                <option value="@c.CategoryId">@c.CategoryName</option>
+            }
         </select>
         <br />
 
@@ -37,6 +37,7 @@
 
         <label asp-for="Rating">Rating:</label>
         <select asp-for="Rating">
+            <option value="">Select</option>
             <option value="G">G</option>
             <option value="PG">PG</option>
             <option value="PG13">PG-13</option>

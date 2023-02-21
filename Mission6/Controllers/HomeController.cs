@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Mission6.Models;
 using System;
@@ -13,12 +14,12 @@ namespace Mission6.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         // get info from context file to controller
-        private MovieFormContext _movieContext { get; set; }
+        private MovieFormContext movieContext { get; set; }
 
         public HomeController(ILogger<HomeController> logger, MovieFormContext X)
         {
             _logger = logger;
-            _movieContext = X;
+            movieContext = X;
         }
 
         public IActionResult Index()
@@ -34,16 +35,71 @@ namespace Mission6.Controllers
         [HttpGet]
         public IActionResult MovieForm()
         {
-            return View("MovieForm");
+            ViewBag.Categories = movieContext.Categories.ToList();
+            return View();
         }
 
         [HttpPost]
         public IActionResult MovieForm(FormResponse fr)
         {
-            _movieContext.Add(fr);
-            _movieContext.SaveChanges();
+            // if model is valid, add to list, save changes, and confirm the form
+            // submission to the user
+            if (ModelState.IsValid)
+            {
+                movieContext.Add(fr);
+                movieContext.SaveChanges();
 
-            return View("Confirmation", fr);
+                return View("Confirmation", fr);
+            }
+
+            else // if invalid, make user fix errors
+            {
+                ViewBag.Categories = movieContext.Categories.ToList();
+
+                return View();
+            }
+        }
+
+        public IActionResult MovieList()
+        {
+            var forms = movieContext.responses.Include(x => x.Category)
+                .OrderBy(x => x.Category)
+                .ToList();
+            return View(forms);
+        }
+        
+        [HttpGet]
+        public IActionResult Edit(int formid)
+        {
+            ViewBag.Categories = movieContext.Categories.ToList();
+
+            var form = movieContext.responses.Single(x => x.FormId == formid);
+
+            return View("MovieForm", form);
+        }
+
+        [HttpPost]
+        public IActionResult Edit (FormResponse fr)
+        {
+            movieContext.Update(fr);
+            movieContext.SaveChanges();
+
+            return RedirectToAction("MovieList");
+        }
+
+        [HttpGet]
+        public IActionResult Delete(int formid)
+        {
+            var form = movieContext.responses.Single(x => x.FormId == formid);
+            return View(form);
+        }
+
+        [HttpPost]
+        public IActionResult Delete(FormResponse fr)
+        {
+            movieContext.responses.Remove(fr);
+            movieContext.SaveChanges();
+            return RedirectToAction("MovieList");
         }
         public IActionResult Privacy()
         {
