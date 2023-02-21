@@ -8,7 +8,7 @@ using Mission6.Models;
 namespace Mission6.Migrations
 {
     [DbContext(typeof(MovieFormContext))]
-    [Migration("20230209231535_Initial")]
+    [Migration("20230216202106_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -17,15 +17,70 @@ namespace Mission6.Migrations
             modelBuilder
                 .HasAnnotation("ProductVersion", "3.1.22");
 
+            modelBuilder.Entity("Mission6.Models.Category", b =>
+                {
+                    b.Property<int>("CategoryId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("CategoryName")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("CategoryId");
+
+                    b.ToTable("Categories");
+
+                    b.HasData(
+                        new
+                        {
+                            CategoryId = 1,
+                            CategoryName = "Action/Adventure"
+                        },
+                        new
+                        {
+                            CategoryId = 2,
+                            CategoryName = "Comedy"
+                        },
+                        new
+                        {
+                            CategoryId = 3,
+                            CategoryName = "Drama"
+                        },
+                        new
+                        {
+                            CategoryId = 4,
+                            CategoryName = "Family"
+                        },
+                        new
+                        {
+                            CategoryId = 5,
+                            CategoryName = "Horror/Suspense"
+                        },
+                        new
+                        {
+                            CategoryId = 6,
+                            CategoryName = "Miscellaneous"
+                        },
+                        new
+                        {
+                            CategoryId = 7,
+                            CategoryName = "Television"
+                        },
+                        new
+                        {
+                            CategoryId = 8,
+                            CategoryName = "VHS"
+                        });
+                });
+
             modelBuilder.Entity("Mission6.Models.FormResponse", b =>
                 {
                     b.Property<int>("FormId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Category")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
+                    b.Property<int>("CategoryId")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Director")
                         .IsRequired()
@@ -54,13 +109,15 @@ namespace Mission6.Migrations
 
                     b.HasKey("FormId");
 
+                    b.HasIndex("CategoryId");
+
                     b.ToTable("responses");
 
                     b.HasData(
                         new
                         {
                             FormId = 1,
-                            Category = "Comedy",
+                            CategoryId = 2,
                             Director = "Anne Fletcher",
                             Edited = false,
                             Rating = "PG-13",
@@ -70,7 +127,7 @@ namespace Mission6.Migrations
                         new
                         {
                             FormId = 2,
-                            Category = "Drama",
+                            CategoryId = 3,
                             Director = "Anne Fletcher",
                             Edited = false,
                             Rating = "PG-13",
@@ -80,13 +137,22 @@ namespace Mission6.Migrations
                         new
                         {
                             FormId = 3,
-                            Category = "Comedy",
+                            CategoryId = 2,
                             Director = "Nick Cassavetes",
                             Edited = false,
                             Rating = "PG-13",
                             Title = "The Other Woman",
                             Year = 2014
                         });
+                });
+
+            modelBuilder.Entity("Mission6.Models.FormResponse", b =>
+                {
+                    b.HasOne("Mission6.Models.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }
